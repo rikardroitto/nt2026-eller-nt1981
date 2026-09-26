@@ -114,6 +114,7 @@ main { flex: 1; }
 footer.foot { margin-top: 40px; font-size: 13px; color: var(--muted); text-align: center; }
 a { color: var(--accent); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+[tabindex="-1"]:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
