@@ -117,6 +117,7 @@ a { color: var(--accent); }
 [tabindex="-1"]:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<script data-goatcounter="https://nt2026vsnt1981.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -144,6 +145,7 @@ a { color: var(--accent); }
         <p>Verserna är utvalda för att visa vad som är nytt i NT&nbsp;2026: ord som bytts ut, klassiska formuleringar som kommit tillbaka och nya val bland handskrifterna. Efter varje svar får du veta vad som ändrats.</p>
         <p>Den äldre texten är Nya testamentet i Bibel&nbsp;2000, som bygger på NT&nbsp;81. NT&nbsp;2026-texten är hämtad ur översättningens slutliga Paratext-version (september 2026). Tio verser dras slumpvis bland de 60 mest kända, hundra verser ger hela urvalet i slumpvis ordning.</p>
         <p>Bibeltexter: NT&nbsp;2026 © Svenska Bibelsällskapet 2026. Bibel&nbsp;2000 © Svenska Bibelsällskapet.</p>
+        <p>Sidan räknar besök och spelade omgångar anonymt med GoatCounter, utan cookies.</p>
       </details>
     </section>
 
@@ -220,7 +222,14 @@ a { color: var(--accent); }
     window.scrollTo(0, 0);
   }
 
+  // Anonym statistik (GoatCounter). Skriptet laddas asynkront, så vänta in det vid behov.
+  function track(name) {
+    var go = function () { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, event: true }); } catch (e) {} };
+    if (document.readyState === "complete") go(); else window.addEventListener("load", go);
+  }
+
   function start(count) {
+    track("start-" + count);
     var pool = count === 10 ? range(TOP_FOR_SHORT) : range(DATA.length);
     state.order = shuffle(pool).slice(0, count);
     state.total = count; state.i = 0; state.score = 0;
@@ -343,6 +352,7 @@ a { color: var(--accent); }
     $("shMail").href = "mailto:?subject=" + enc(TITLE) + "&body=" + enc(text + "\n\n" + url);
     $("copied").textContent = "";
     $("copy").onclick = function () {
+      track("dela-kopiera");
       var done = function () { $("copied").textContent = "Länken är kopierad."; };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(done, function () { window.prompt("Kopiera länken:", url); });
@@ -351,8 +361,9 @@ a { color: var(--accent); }
     var ns = $("nativeShare");
     if (navigator.share) {
       ns.hidden = false;
-      ns.onclick = function () { navigator.share({ title: TITLE, text: text, url: url }).catch(function () {}); };
+      ns.onclick = function () { track("dela-system"); navigator.share({ title: TITLE, text: text, url: url }).catch(function () {}); };
     }
+    track("klar-" + t); track("resultat-" + s + "-av-" + t);
     $("progress").style.width = "100%";
     show("end");
     $("final").setAttribute("tabindex", "-1");
@@ -371,7 +382,12 @@ a { color: var(--accent); }
     var st = document.createElement("strong"); st.textContent = s + " av " + t + " rätt"; f.appendChild(st);
     f.appendChild(document.createTextNode(". Kan du slå det?"));
     f.hidden = false;
+    track("fran-delad-lank-" + t);
   }
+
+  [["shFb", "facebook"], ["shX", "x"], ["shWa", "whatsapp"], ["shLi", "linkedin"], ["shMail", "epost"]].forEach(function (p) {
+    $(p[0]).addEventListener("click", function () { track("dela-" + p[1]); });
+  });
 
   document.querySelectorAll("[data-count]").forEach(function (b) {
     b.addEventListener("click", function () { start(parseInt(b.getAttribute("data-count"), 10)); });
